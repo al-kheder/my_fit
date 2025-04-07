@@ -1,11 +1,3 @@
-fastapi
-uvicorn
-sqlalchemy
+uvicorn[standard]
 pydantic
-passlib
-python-jose
-python-multipart
-psycopg2-binary
-alembic
-bcrypt
-python-dotenv
+fastapi
