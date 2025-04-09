@@ -1,3 +1,16 @@
 uvicorn[standard]
 pydantic
 fastapi
+sqlalchemy
+databases[asyncpg]
+python-dotenv
+pydantic-settings
+python-dotenv
+rich
+asgi-correlation-id
+python-json-logger
+python-multipart
+python-jose
+passlib[bcrypt]
+
+

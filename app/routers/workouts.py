@@ -1,38 +1,60 @@
+import logging
+
 from fastapi import APIRouter, HTTPException
 from app.models.workouts import UserWorkoutIn, UserWorkoutOut
 
-
+from app.db.database import database, workout_table
 
 
 router = APIRouter()
 
 # Define a mock database for demonstration purposes
-workout_table = {}
+#workout_table = {}
+
+logger = logging.getLogger(__name__)
+
+async def find_workout_by_id(workout_id):
+    query = workout_table.select().where(workout_table.c.id == workout_id)
+    workout = await database.fetch_one(query)
+    return workout
+async def find_workout_by_name(workout_name):
+    query = workout_table.select().where(workout_table.c.workout_name == workout_name)
+    workout = await database.fetch_one(query)
+    return workout
 
 #create a workout
 @router.post("/workout", response_model=UserWorkoutOut, status_code=201,description="add a new workout")
 async def add_workout(workout: UserWorkoutIn):
     # Check if the workout already exists
-    if workout.workout_name in workout_table:
+    existing_workout = await find_workout_by_name(workout.workout_name)
+    if existing_workout:
         raise HTTPException(status_code=400, detail="Workout already exists")
-    data = workout.dict()  # Convert the Pydantic model to a dictionary
-    last_record_id = len(workout_table)
-    # Insert the new workout into the mock database
-    #workout_table[workout.id] = workout
-    new_workout = {**data, "id": last_record_id}
-    workout_table[last_record_id] = new_workout
-    return new_workout
+    data = workout.model_dump()  # Convert the Pydantic model to a dictionary
+    query = workout_table.insert().values(data)
+    logger.debug(query)
+    last_record_id = await database.execute(query)
+    generated_workout = {**data, "id": last_record_id}
+    return generated_workout
+
 
 
 # Get all workouts
 @router.get("/workout", response_model=list[UserWorkoutOut],description="get all workouts")
 async def get_all_workouts():
-    if not workout_table:
-        raise HTTPException(status_code=404, detail="No workouts found")
+    query = workout_table.select()
+    logger.debug(query)
+    workouts = await database.fetch_all(query)
+    return workouts
 
-    return list(workout_table.values())
 
+#TODO
+#Add a workout (requires authentication)
 
+#Get a workout (requires authentication)
+# Get a workout by ID. (requires ownership)
+#Update a workout.     (requires ownership)
+#Delete a workout.     (requires ownership)
+#
 
 
 

@@ -1,11 +1,13 @@
+import os
 from typing import AsyncGenerator, Generator
 
 import pytest
 from fastapi.testclient import TestClient
 from httpx import AsyncClient
-
+os.environ["ENV_STATE"] = "dev"  # set the environment variable to test
+from app.db.database import database
 from app.main import app
-from app.routers.workouts import workout_table
+
 
 
 @pytest.fixture(scope="session")  # make sure the test client is only created once and specify which async environment pytest uses
@@ -21,9 +23,9 @@ def client() -> Generator:
 # clear the database after each test
 @pytest.fixture(autouse=True)
 async def db() -> AsyncGenerator:
-    workout_table.clear()
+    await database.connect()
     yield
-
+    await database.disconnect() # Rollback any changes made to the database during the test (undo any changes made to the database during the test)
 
 
 @pytest.fixture()
