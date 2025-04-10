@@ -2,6 +2,13 @@ import pytest
 from app.authentications import security
 
 
+def test_hash_password():
+    """Test the hash_password function."""
+    password = "testpassword"
+    hashed_password = security.hash_password(password)
+    assert hashed_password != password
+    assert security.verify_password(password, hashed_password)
+
 
 @pytest.mark.anyio
 async def test_get_user(registered_user:dict):
