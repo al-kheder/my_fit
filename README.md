@@ -13,22 +13,22 @@ This README provides instructions on how to set up and run the FastAPI applicati
 ### 1. Clone the Repository
 
 ```bash
-git clone <repository-url>
-cd <project-directory>
+  git clone <https://github.com/al-kheder/my_fit.git>
+  cd <Stay_fit>
 ```
 
 ### 2. Create and Activate a Virtual Environment (Optional but Recommended)
 
 **For Windows:**
 ```bash
-python -m venv venv
-venv\Scripts\activate
+  python -m venv venv
+  venv\Scripts\activate
 ```
 
 **For macOS/Linux:**
 ```bash
-python3 -m venv venv
-source venv/bin/activate
+  python3 -m venv venv
+  source venv/bin/activate
 ```
 
 ### 3. Install Dependencies
@@ -36,7 +36,7 @@ source venv/bin/activate
 Install all required packages from the `requirements.txt` file:
 
 ```bash
-pip install -r requirements.txt
+  pip install -r requirements.txt
 ```
 
 ### 4. Set Up Environment Variables
@@ -70,7 +70,7 @@ Make sure to replace the placeholder values with your actual configuration:
 You can run the FastAPI application using Uvicorn:
 
 ```bash
-uvicorn app.main:app --reload
+  uvicorn app.main:app --reload
 ```
 
 - `app.main:app` refers to the `app` object in `main.py` file inside the `app` package
@@ -82,7 +82,7 @@ Additional Uvicorn options:
 
 For production deployment:
 ```bash
-uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 4
+  uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 4
 ```
 
 ### 6. Access the Application
@@ -97,13 +97,13 @@ Once running, you can access:
 To run the tests:
 
 ```bash
-pytest
+  pytest 
 ```
 
 For more detailed test output:
 
 ```bash
-pytest -v
+  pytest -v
 ```
 
 ## Troubleshooting
@@ -144,14 +144,10 @@ app/
 ├──.env.example                         # Example environment variables
 ├──.gitignore                           # Git ignore file
 ├──my_fit_logger.log                    # recorded logs 
+├──README.md                            # Project documentation
 ├──.pre-commit-config.yaml              # Pre-commit hooks configuration
 ├──requirements.txt                     # Project dependencies
 ├──requirements-dev.txt                 # Development dependencies
-
-
-
-
-
 
 
 ```
