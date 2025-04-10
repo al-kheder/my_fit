@@ -1,11 +1,12 @@
 import os
 from typing import AsyncGenerator, Generator
 
+import uuid
 import pytest
 from fastapi.testclient import TestClient
 from httpx import AsyncClient
 os.environ["ENV_STATE"] = "dev"  # set the environment variable to test
-from app.db.database import database
+from app.db.database import database, user_table
 from app.main import app
 
 
@@ -35,5 +36,28 @@ async def async_client() -> AsyncGenerator:
 
 
 
+@pytest.fixture()
+async def registered_user(async_client: AsyncClient) -> dict:
+    user_details = {
+        "email": f"user_{uuid.uuid4().hex[:6]}@example.com",  # Added 'user_' prefix
+        "password": "testpassword123!"  # Made more robust
+    }
+
+    # 1. Make registration request and verify success
+    response = await async_client.post("/register", json=user_details)
+    assert response.status_code == 201, f"Registration failed: {response.json()}"
+
+    if response.status_code != 201:
+        print(f"Response: {response.json()}")
+        pytest.fail("Registration failed")
+
+    # 2. Fetch user from database
+    query = user_table.select().where(user_table.c.email == user_details["email"])
+    user = await database.fetch_one(query)
+    assert user is not None, "User not found in database after registration"
+
+    # 3. Add ID to user_details and return
+    user_details["id"] = user.id  # Fixed dictionary access
+    return user_details
 
 

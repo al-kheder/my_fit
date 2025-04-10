@@ -1,10 +1,14 @@
 from __future__ import annotations
 
+import logging
+
 from functools import lru_cache
 from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from typing import Literal
 import os
+
+logger = logging.getLogger(__name__)
 
 # Define environment state type
 EnvironmentState = Literal["dev", "test", "prod"]
@@ -61,5 +65,5 @@ def get_config(env_state: EnvironmentState | None = None) -> GlobalConfig:
 
 # Initialize config
 config = get_config()
-print(f"Config loaded for {config.ENV_STATE} environment")
-print(f"Database URL: {config.DATABASE_URL.split('@')[0]}@[hidden]")
+logger.debug("Current Environment: %s", config.ENV_STATE)
+logger.debug("Database URL: %s", config.DATABASE_URL.split("@")[0] + "@[hidden]")

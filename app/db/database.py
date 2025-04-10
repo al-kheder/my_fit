@@ -1,6 +1,10 @@
+import logging
 import databases
 import sqlalchemy
 from app.app_configs.environment_config import config
+
+
+logger = logging.getLogger(__name__)
 
 # Create SQLAlchemy metadata to store information about the database schema
 metadata = sqlalchemy.MetaData()
@@ -11,8 +15,7 @@ user_table = sqlalchemy.Table(
     metadata,
     sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True),
     sqlalchemy.Column("email", sqlalchemy.String(255), unique=True, index=True),
-    sqlalchemy.Column("hashed_password", sqlalchemy.String(255)),
-    sqlalchemy.Column("is_active", sqlalchemy.Boolean, default=True),
+    sqlalchemy.Column("password", sqlalchemy.String(255)),
 )
 
 # Define workout table
@@ -43,12 +46,13 @@ goal_table = sqlalchemy.Table(
 # Create engine using the same URL as your database connection
 # This is important for consistency
 # Temporarily add this at the top of your database.py
-print(f"Current DATABASE_URL database.py: {config.DATABASE_URL}")
+logger.info("Current DATABASE_URL database.py: %s", config.DATABASE_URL)
 engine = sqlalchemy.create_engine(config.DATABASE_URL)
 
 # Create all tables
 #TODO - delete drop_all when not needed
-metadata.drop_all(engine)
+#metadata.drop_all(engine)
+#logger.info("Dropping all tables in the database")
 metadata.create_all(engine)
 
 # Database connection for async operations

@@ -6,6 +6,7 @@ from fastapi.exception_handlers import http_exception_handler
 from asgi_correlation_id import CorrelationIdMiddleware
 from app.db.database import database
 from app.routers.workouts import router as workout_router
+from app.routers.user import router as user_router
 from app.app_configs.logging_configuration import configure_logging
 
 logger = logging.getLogger(__name__)
@@ -26,6 +27,8 @@ app = FastAPI(lifespan=lifespan)
 app.add_middleware(CorrelationIdMiddleware)
 
 app.include_router(workout_router,tags=["workouts"])
+app.include_router(user_router,tags=["user"])
+
 
 @app.exception_handler(HTTPException)
 async def http_exception_handler_logging(request, exc):

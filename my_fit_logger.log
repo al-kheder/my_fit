@@ -1,0 +1,25 @@
+{"asctime": "2025-04-10 12:39:22", "name": "app.main", "lineno": 21, "correlation_id": "-", "levelname": "INFO", "message": "Connected to the databases..."}
+{"asctime": "2025-04-10 12:39:22", "name": "uvicorn.error", "lineno": 62, "correlation_id": "-", "levelname": "INFO", "message": "Application startup complete."}
+{"asctime": "2025-04-10 12:39:53", "name": "uvicorn.error", "lineno": 265, "correlation_id": "-", "levelname": "INFO", "message": "Shutting down"}
+{"asctime": "2025-04-10 12:39:53", "name": "uvicorn.error", "lineno": 67, "correlation_id": "-", "levelname": "INFO", "message": "Waiting for application shutdown."}
+{"asctime": "2025-04-10 12:39:53", "name": "uvicorn.error", "lineno": 78, "correlation_id": "-", "levelname": "INFO", "message": "Application shutdown complete."}
+{"asctime": "2025-04-10 12:39:53", "name": "uvicorn.error", "lineno": 86, "correlation_id": "-", "levelname": "INFO", "message": "Finished server process [50401]", "color_message": "Finished server process [\u001b[36m%d\u001b[0m]"}
+{"asctime": "2025-04-10 12:39:57", "name": "app.main", "lineno": 21, "correlation_id": "-", "levelname": "INFO", "message": "Connected to the databases..."}
+{"asctime": "2025-04-10 12:39:57", "name": "uvicorn.error", "lineno": 62, "correlation_id": "-", "levelname": "INFO", "message": "Application startup complete."}
+{"asctime": "2025-04-10 15:11:56", "name": "app.routers.user", "lineno": 17, "correlation_id": "6f8a45b6", "levelname": "DEBUG", "message": "Inserting user into database: user_1474d3@example.com"}
+{"asctime": "2025-04-10 15:11:57", "name": "uvicorn.access", "lineno": 505, "correlation_id": "6f8a45b6", "levelname": "INFO", "message": "127.0.0.1:63665 - \"POST /register HTTP/1.1\" 201"}
+{"asctime": "2025-04-10 15:11:57", "name": "app.routers.user", "lineno": 17, "correlation_id": "1f9ec1a8", "levelname": "DEBUG", "message": "Inserting user into database: user_82f237@example.com"}
+{"asctime": "2025-04-10 15:11:57", "name": "uvicorn.access", "lineno": 505, "correlation_id": "1f9ec1a8", "levelname": "INFO", "message": "127.0.0.1:63677 - \"POST /register HTTP/1.1\" 201"}
+{"asctime": "2025-04-10 15:11:57", "name": "app.authentications.security", "lineno": 14, "correlation_id": "eab7e440", "levelname": "DEBUG", "message": "User found: user_82f237@example.com"}
+{"asctime": "2025-04-10 15:11:57", "name": "app.main", "lineno": 35, "correlation_id": "eab7e440", "levelname": "ERROR", "message": "HTTP Exception: 400 Email already registered"}
+{"asctime": "2025-04-10 15:11:57", "name": "uvicorn.access", "lineno": 505, "correlation_id": "eab7e440", "levelname": "INFO", "message": "127.0.0.1:63677 - \"POST /register HTTP/1.1\" 400"}
+{"asctime": "2025-04-10 15:11:57", "name": "app.routers.workouts", "lineno": 34, "correlation_id": "e354b2cd", "levelname": "DEBUG", "message": "INSERT INTO workouts (workout_name, workout_type, workout_duration, calories_burned, notes, workout_date) VALUES (:workout_name, :workout_type, :workout_duration, :calories_burned, :notes, :workout_date)"}
+{"asctime": "2025-04-10 15:11:57", "name": "uvicorn.access", "lineno": 505, "correlation_id": "e354b2cd", "levelname": "INFO", "message": "127.0.0.1:63688 - \"POST /workout HTTP/1.1\" 201"}
+{"asctime": "2025-04-10 15:11:57", "name": "app.routers.workouts", "lineno": 34, "correlation_id": "55b246cb", "levelname": "DEBUG", "message": "INSERT INTO workouts (workout_name, workout_type, workout_duration, calories_burned, notes, workout_date) VALUES (:workout_name, :workout_type, :workout_duration, :calories_burned, :notes, :workout_date)"}
+{"asctime": "2025-04-10 15:11:57", "name": "uvicorn.access", "lineno": 505, "correlation_id": "55b246cb", "levelname": "INFO", "message": "127.0.0.1:63699 - \"POST /workout HTTP/1.1\" 201"}
+{"asctime": "2025-04-10 15:11:57", "name": "app.routers.workouts", "lineno": 45, "correlation_id": "ef318c23", "levelname": "DEBUG", "message": "SELECT workouts.id, workouts.workout_name, workouts.workout_type, workouts.workout_duration, workouts.calories_burned, workouts.notes, workouts.workout_date, workouts.created_at \nFROM workouts"}
+{"asctime": "2025-04-10 15:11:57", "name": "uvicorn.access", "lineno": 505, "correlation_id": "ef318c23", "levelname": "INFO", "message": "127.0.0.1:63699 - \"GET /workout HTTP/1.1\" 200"}
+{"asctime": "2025-04-10 15:11:57", "name": "app.routers.user", "lineno": 17, "correlation_id": "ead26fbb", "levelname": "DEBUG", "message": "Inserting user into database: user_257453@example.com"}
+{"asctime": "2025-04-10 15:11:57", "name": "uvicorn.access", "lineno": 505, "correlation_id": "ead26fbb", "levelname": "INFO", "message": "127.0.0.1:63710 - \"POST /register HTTP/1.1\" 201"}
+{"asctime": "2025-04-10 15:16:47", "name": "uvicorn.access", "lineno": 505, "correlation_id": "94f7f6f0", "levelname": "INFO", "message": "127.0.0.1:63873 - \"GET /docs HTTP/1.1\" 200"}
+{"asctime": "2025-04-10 15:16:48", "name": "uvicorn.access", "lineno": 505, "correlation_id": "03979d1d", "levelname": "INFO", "message": "127.0.0.1:63873 - \"GET /openapi.json HTTP/1.1\" 200"}

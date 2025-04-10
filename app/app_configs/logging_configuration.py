@@ -38,7 +38,7 @@ def configure_logging()->None:
                     "class":"logging.handlers.RotatingFileHandler",
                     "level":"DEBUG",
                     "formatter":"file",
-                    "filename":"storeapi.log",
+                    "filename":"my_fit_logger.log",
                     "maxBytes":1024*1024*5,
                     "backupCount":2,
                     "encoding":"utf-8",
