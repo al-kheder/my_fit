@@ -39,7 +39,7 @@ async def async_client() -> AsyncGenerator:
 @pytest.fixture()
 async def registered_user(async_client: AsyncClient) -> dict:
     user_details = {
-        "email": f"user_{uuid.uuid4().hex[:6]}@example.com",  # Added 'user_' prefix
+        "email": f"user_{uuid.uuid4().hex[:3]}@example.com /register user conftest",  # Added 'user_' prefix
         "password": "testpassword123!"  # Made more robust
     }
 
@@ -55,9 +55,13 @@ async def registered_user(async_client: AsyncClient) -> dict:
     query = user_table.select().where(user_table.c.email == user_details["email"])
     user = await database.fetch_one(query)
     assert user is not None, "User not found in database after registration"
-
     # 3. Add ID to user_details and return
     user_details["id"] = user.id  # Fixed dictionary access
     return user_details
 
+
+@pytest.fixture()
+async def logged_in_token(async_client: AsyncClient, registered_user: dict) -> str:
+    response = await async_client.post("/token",json=registered_user)
+    return response.json()["access_token"]  # Extract the token from the response
 

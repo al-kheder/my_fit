@@ -24,43 +24,49 @@ class BaseConfig(BaseSettings):
     )
 
 class GlobalConfig(BaseConfig):
-    """Global configuration shared across all environments"""
     DATABASE_URL: str  # Required field
     DB_FORCE_ROLLBACK: bool = False
 
+    # JWT Authentication settings
+    SECRET_KEY: str
+    ALGORITHM: str = "HS256"
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+
+    #AI settings
+
+
     @field_validator("DATABASE_URL")
     def validate_db_url(cls, v: str) -> str:
-        """Validate the database URL"""
         if not v:
             raise ValueError("DATABASE_URL must be set")
         if "postgresql" in v and not os.getenv("POSTGRES_PASSWORD") and "@" not in v.split("//")[1]:
             raise ValueError("Invalid PostgreSQL URL format")
         return v
 
+    @field_validator("SECRET_KEY")
+    def validate_secret_key(cls, v: str) -> str:
+        if not v:
+            raise ValueError("SECRET_KEY must be set")
+        return v
+
 class DevConfig(GlobalConfig):
-    """Development specific configuration"""
     model_config = SettingsConfigDict(env_prefix="DEV_")
 
 class TestConfig(GlobalConfig):
-    """Testing specific configuration"""
     model_config = SettingsConfigDict(env_prefix="TEST_")
     DB_FORCE_ROLLBACK: bool = True
 
 class ProdConfig(GlobalConfig):
-    """Production specific configuration"""
     model_config = SettingsConfigDict(env_prefix="PROD_")
 
 @lru_cache()
 def get_config(env_state: EnvironmentState | None = None) -> GlobalConfig:
-    """Get the appropriate config based on environment state"""
     env_state = env_state or BaseConfig().ENV_STATE or "dev"
-
     configs = {
         "dev": DevConfig,
         "test": TestConfig,
         "prod": ProdConfig
     }
-
     return configs[env_state]()
 
 # Initialize config
