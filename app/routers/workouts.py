@@ -3,11 +3,13 @@ import logging
 from fastapi import APIRouter, HTTPException, Depends
 from typing import Annotated
 
+from app.db.summary_updater import update_workout_summary
 from app.models.workouts import UserWorkoutIn, UserWorkoutOut
 from app.models.users import User
 from app.authentications.security import get_current_user,oauth2_scheme
 
 from app.db.database import database, workout_table
+#from app.db.queries import update_progress_summary
 
 
 router = APIRouter()
@@ -16,6 +18,8 @@ router = APIRouter()
 #workout_table = {}
 
 logger = logging.getLogger(__name__)
+
+
 
 async def find_workout_by_id(workout_id):
     query = workout_table.select().where(workout_table.c.id == workout_id)
@@ -40,6 +44,9 @@ async def add_workout(workout: UserWorkoutIn,current_user:Annotated[User, Depend
     logger.debug(query)
     last_record_id = await database.execute(query)
     generated_workout = {**data, "id": last_record_id}
+    # update the workout summary
+    await update_workout_summary(current_user.id)
+
     return generated_workout
 
 
@@ -74,7 +81,6 @@ async def get_workout_by_id(workout_id: int, current_user: Annotated[User, Depen
 @router.put("/workout/{workout_id}", response_model=UserWorkoutOut, description="Update a workout")
 async def update_workout(workout_id: int, workout_update: UserWorkoutIn, current_user: Annotated[User, Depends(get_current_user)]):
     logger.info(f"Updating workout with ID: {workout_id}")
-
     # Check if workout exists
     existing_workout = await find_workout_by_id(workout_id)
     if not existing_workout:
@@ -91,6 +97,8 @@ async def update_workout(workout_id: int, workout_update: UserWorkoutIn, current
     ).values(**data)
 
     await database.execute(query)
+    # update the workout summary
+    await update_workout_summary(current_user.id)
 
     # Return the updated workout
     return {**data, "id": workout_id}
@@ -113,16 +121,11 @@ async def delete_workout(workout_id: int, current_user: Annotated[User, Depends(
     # Delete the workout
     query = workout_table.delete().where(workout_table.c.id == workout_id)
     await database.execute(query)
+    # update the workout summary
+    await update_workout_summary(current_user.id)
 
     return None
-#TODO
-#Add a workout (requires authentication)
 
-#Get a workout (requires authentication)
-# Get a workout by ID. (requires ownership)
-#Update a workout.     (requires ownership)
-#Delete a workout.     (requires ownership)
-#
 
 
 

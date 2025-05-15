@@ -1,6 +1,7 @@
 import logging
 import databases
 import sqlalchemy
+from datetime import datetime
 from app.app_configs.environment_config import config
 
 
@@ -30,7 +31,7 @@ workout_table = sqlalchemy.Table(
     sqlalchemy.Column("notes", sqlalchemy.String),
     sqlalchemy.Column("workout_date", sqlalchemy.DateTime),
     sqlalchemy.Column("created_at", sqlalchemy.DateTime),
-    sqlalchemy.Column("user_id", sqlalchemy.ForeignKey("users.id"), nullable=False)
+    sqlalchemy.Column("user_id", sqlalchemy.ForeignKey("users.id",ondelete="CASCADE"), nullable=False)
 )
 
 goal_table = sqlalchemy.Table(
@@ -43,8 +44,28 @@ goal_table = sqlalchemy.Table(
     sqlalchemy.Column("daily_target_calories", sqlalchemy.Integer),
     sqlalchemy.Column("daily_time_minutes", sqlalchemy.Integer),
     sqlalchemy.Column("duration_days", sqlalchemy.Integer),
-    sqlalchemy.Column("user_id", sqlalchemy.ForeignKey("users.id"), nullable=False)
+    sqlalchemy.Column("user_id", sqlalchemy.ForeignKey("users.id",ondelete="CASCADE"), nullable=False)
 )
+
+
+progress_summary_table =sqlalchemy.Table(
+    "progress_summary",
+    metadata,
+    sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True),
+    sqlalchemy.Column("user_id", sqlalchemy.Integer, sqlalchemy.ForeignKey("users.id", ondelete="CASCADE")),
+    sqlalchemy.Column("total_workouts", sqlalchemy.Integer),
+    sqlalchemy.Column("total_duration", sqlalchemy.Integer),
+    sqlalchemy.Column("total_calories_burned", sqlalchemy.Integer),
+    sqlalchemy.Column("remaining_duration_to_goal", sqlalchemy.Integer),
+    sqlalchemy.Column("remaining_calories_to_goal", sqlalchemy.Integer),
+   # sqlalchemy.Column("created_at", sqlalchemy.DateTime, default=datetime.utcnow),
+    sqlalchemy.Column("active_goals", sqlalchemy.JSON, nullable=True),
+    sqlalchemy.Column("workouts", sqlalchemy.JSON, nullable=True)
+)
+
+
+
+
 
 
 
@@ -83,12 +104,16 @@ progress_table = sqlalchemy.Table(
     "progress",
     metadata,
     sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True),
-    sqlalchemy.Column("user_id", sqlalchemy.ForeignKey("users.id"), nullable=False),
+    sqlalchemy.Column("user_id", sqlalchemy.ForeignKey("users.id",ondelete="CASCADE"), nullable=False),
     sqlalchemy.Column("goal_id", sqlalchemy.ForeignKey("goals.id"), nullable=False),
     sqlalchemy.Column("analysis_date", sqlalchemy.Date, default=sqlalchemy.func.now()),
     sqlalchemy.Column("analysis_result", sqlalchemy.Text),
     sqlalchemy.Column("created_at", sqlalchemy.DateTime, default=sqlalchemy.func.now())
 )
+
+
+
+
 # Create engine using the same URL as your database connection
 # This is important for consistency
 # Temporarily add this at the top of your database.py
@@ -97,7 +122,7 @@ engine = sqlalchemy.create_engine(config.DATABASE_URL)
 
 # Create all tables
 #TODO - delete drop_all when not needed
-metadata.drop_all(engine)
+#metadata.drop_all(engine)
 #logger.info("Dropping all tables in the database")
 metadata.create_all(engine)
 

@@ -33,10 +33,19 @@ async def find_goal_by_name(goal_name):
 @router.post("/goal", response_model=UserGoalOut, status_code=201, description="add a new goal")
 async def add_goal(goal: str, current_user: Annotated[User, Depends(get_current_user)]):
     logger.info("Adding a new goal: %s", goal)
-
     try:
         # Get raw response from AI agent (no await since it's not async)
-        raw_response = create_custom_agent(instruction_prompt, goal_description=goal)
+#TODO
+       # raw_response = create_custom_agent(instruction_prompt, goal_description=goal)
+        raw_response = """json{
+  "goal_name": "lose 5 kg",
+  "workout_type": "mixed",
+  "calories_to_burn": 38500,
+  "duration_days": 50,
+  "daily_target_calories": 770,
+  "daily_time_minutes": 77
+}
+"""
 
         # Log the raw response for debugging
         logger.info(f"Raw AI response: {raw_response}")

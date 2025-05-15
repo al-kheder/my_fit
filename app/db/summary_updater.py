@@ -6,33 +6,39 @@ from fastapi.encoders import jsonable_encoder
 
 from app.models.users import User
 from app.authentications.security import get_current_user
-from app.db.database import database, workout_table, goal_table, progress_summary_table
+from app.db.database import database, workout_table, goal_table, progress_summary_table,user_table
+from app.routers.progress import convert_datetime_fields
 
-router = APIRouter()
+
 logger = logging.getLogger(__name__)
 
-def convert_datetime_fields(data: dict) -> dict:
-    """Convert datetime objects to ISO format strings"""
-    for key, value in data.items():
-        if isinstance(value, datetime):
-            data[key] = value.isoformat()
-        elif isinstance(value, list):
-            data[key] = [convert_datetime_fields(item) if isinstance(item, dict) else item for item in value]
-        elif isinstance(value, dict):
-            data[key] = convert_datetime_fields(value)
-    return data
 
-@router.get("/workout-summary", description="Get combined workout and goal data for the current user")
-async def get_workout_progress_summary(current_user: Annotated[User, Depends(get_current_user)]):
-    logger.info(f"Generating workout and goal summary for user: {current_user.id}")
+
+
+
+async def find_workout_by_user_id(user_id):
+    query = user_table.select().where(user_table.c.id == user_id)
+    user = await database.fetch_one(query)
+    return user
+
+
+async def update_workout_summary(user_id: int):
+    logger.info(f"Updating workout with ID: {user_id}")
+    # Check if workout exists
+    existing_user = await find_workout_by_user_id(user_id)
+    if not existing_user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+
+    logger.info(f"Updating workout and goal summary for user: {user_id}")
 
     try:
         # Fetch workouts for the user
-        workout_query = workout_table.select().where(workout_table.c.user_id == current_user.id)
+        workout_query = workout_table.select().where(workout_table.c.user_id == user_id)
         workouts = await database.fetch_all(workout_query)
 
         # Fetch goals for the same user
-        goal_query = goal_table.select().where(goal_table.c.user_id == current_user.id)
+        goal_query = goal_table.select().where(goal_table.c.user_id == user_id)
         goals = await database.fetch_all(goal_query)
 
         # Calculate summary statistics
@@ -53,7 +59,7 @@ async def get_workout_progress_summary(current_user: Annotated[User, Depends(get
 
         # Construct the summary object
         summary = {
-            "user_id": current_user.id,
+            "user_id": user_id,
             "total_workouts": total_workouts,
             "total_duration": total_duration_user_workout,
             "total_calories_burned": total_calories_user_workout,
@@ -64,12 +70,15 @@ async def get_workout_progress_summary(current_user: Annotated[User, Depends(get
         }
 
         # Save to the database
-        query = progress_summary_table.insert().values(summary)
-        logger.info(f"Saving workout summary to database for user: {current_user.id}")
+        query = progress_summary_table.update().where(
+            progress_summary_table.c.user_id == user_id
+        ).values(summary)
+        logger.info(f"Saving workout summary to database for user: {user_id}")
         await database.execute(query)
 
         return jsonable_encoder(summary)
 
     except Exception as e:
-        logger.error(f"Error in get_workout_progress_summary: {str(e)}", exc_info=True)
+        logger.error(f"Error in updating_workout_progress_summary: {str(e)}", exc_info=True)
         raise HTTPException(status_code=500, detail=str(e))
+

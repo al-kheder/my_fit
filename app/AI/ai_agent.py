@@ -1,6 +1,7 @@
 import logging
 from pyexpat.errors import messages
 from typing import Dict, Any
+import re
 import json
 import requests
 import os
@@ -10,37 +11,64 @@ from fastapi import HTTPException
 load_dotenv()
 logger = logging.getLogger(__name__)
 
-def extract_fitness_goal(response_str: str) -> dict:
+
+
+
+logger = logging.getLogger(__name__)
+
+AI_EXAMPLE_RESPONSE :{
+  "goal_name": "lose 5 kg",
+  "workout_type": "mixed",
+  "calories_to_burn": 38500,
+  "duration_days": 50,
+  "daily_target_calories": 770,
+  "daily_time_minutes": 77
+}
+
+def extract_fitness_goal(raw_response: str) -> dict:
     """
-    Extract structured fitness goal data from the AI response string.
+    Extract a structured fitness goal from the AI response.
 
     Args:
-        response_str (str): The raw response string from the AI (expected to be a JSON object)
+        raw_response: Raw string response from the AI
 
     Returns:
-        dict: Parsed data with keys for goal_name, workout_type, etc.
+        Dictionary containing the structured goal data
+
+    Raises:
+        ValueError: If the response cannot be parsed as JSON
     """
+    logger.debug(f"Attempting to extract JSON from raw response: {raw_response[:100]}...")
+
+    # First try direct JSON parsing
     try:
-        # Parse the string response to a dictionary
-        data = json.loads(response_str)
-
-        # Validate required fields
-        required_keys = [
-            "goal_name", "workout_type", "calories_to_burn",
-            "duration_days", "daily_target_calories", "daily_time_minutes"
-        ]
-        for key in required_keys:
-            if key not in data:
-                raise KeyError(f"Missing key in response: {key}")
-
-        return data
+        return json.loads(raw_response)
     except json.JSONDecodeError:
-        logger.error(f"Failed to parse JSON response: {response_str}")
-        raise ValueError("Response is not valid JSON")
-    except Exception as e:
-        logger.error(f"Error extracting fitness goal: {str(e)}")
-        raise
+        logger.debug("Direct JSON parsing failed, attempting to extract JSON from text")
 
+    # Try to extract JSON objects from the text response - common pattern with AI responses
+    json_pattern = r'(\{[\s\S]*?\})'
+    json_matches = re.findall(json_pattern, raw_response)
+
+    for potential_json in json_matches:
+        try:
+            goal_data = json.loads(potential_json)
+
+            # Validate required fields
+            required_fields = [
+                "goal_name", "workout_type", "calories_to_burn",
+                "duration_days", "daily_target_calories", "daily_time_minutes"
+            ]
+
+            if all(field in goal_data for field in required_fields):
+                logger.debug(f"Successfully extracted JSON: {goal_data}")
+                return goal_data
+        except json.JSONDecodeError:
+            continue
+
+    # If we get here, we couldn't extract valid JSON
+    logger.error(f"Failed to extract valid JSON from response: {raw_response}")
+    raise ValueError("Response is not valid JSON")
 
 
 def create_custom_agent(instruction_prompt: str,goal_description: str):
@@ -71,11 +99,12 @@ def create_custom_agent(instruction_prompt: str,goal_description: str):
         response.raise_for_status()
 
         data = response.json()
-
+#TODO
         # Extract message content based on the API response structure
         if 'choices' in data and len(data['choices']) > 0:
             print(data['choices'][0]['message']['content'])
             return data['choices'][0]['message']['content']
+
         elif 'messages' in data and len(data['messages']) > 0:
             return data['messages'][0]['content']
         else:
@@ -91,21 +120,3 @@ def create_custom_agent(instruction_prompt: str,goal_description: str):
 
 
 
-create_custom_agent(instruction_prompt=f"""
-You are a fitness goal planner assistant. 
-Based on the user's goal description below, return a JSON object with a detailed breakdown of their workout target. 
-Use this format:
-  "goal_name": "string",
-  "workout_type": "string",
-  "calories_to_burn": integer,
-  "duration_days": integer,
-  "daily_target_calories": integer,
-  "daily_time_minutes": integer,
-
-Use these rules:
-- 1 kg of fat = 7700 kcal
-- Estimate calorie burn rate based on the activity (e.g., Running ≈ 10 kcal/min, Walking ≈ 4 kcal/min, Cycling ≈ 8 kcal/min)
-- Assume 5 workout days per week unless specified otherwise
-- Only return the JSON object, no explanation
-   """,goal_description="lose 5 kg in 3 months"
-)
