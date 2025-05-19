@@ -6,6 +6,7 @@ from fastapi import APIRouter, HTTPException, Depends
 from typing import Annotated
 
 from app.AI.ai_agent import create_custom_agent, extract_fitness_goal
+from app.db.summary_updater import update_workout_summary
 from app.models.goals import UserGoalIn,UserGoalOut
 from app.models.users import User
 from app.authentications.security import get_current_user,oauth2_scheme
@@ -76,6 +77,7 @@ async def add_goal(goal: str, current_user: Annotated[User, Depends(get_current_
         query = goal_table.insert().values(goal_dict)
         last_record_id = await database.execute(query)
 
+        await update_workout_summary(current_user.id)
         # Return the created goal with its ID
         return {**goal_dict, "id": last_record_id}
 

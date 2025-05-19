@@ -5,15 +5,12 @@ from datetime import datetime, timedelta
 
 
 class OverallSummary(BaseModel):
+    id: int
+    user_id: int
     total_workouts: int
-    total_calories_burned: float
-    #total_minutes: float
-    #active_days: int
-    #active_goals: int
-    #goals_on_track: int = 0
-    #goals_completed: int = 0
-    #workout_types: Dict[str, Dict[str, Union[int, float]]]
-    #average_daily_calories: float
-    #average_workout_duration: float
-    #max_streak: int = 0
-    #current_streak: int = 0
+    total_duration: int
+    total_calories_burned: int
+    remaining_duration_to_goal: int
+    remaining_calories_to_goal: int
+    active_goals: Optional[Dict] = None
+    workouts: Optional[List[Dict]] = None

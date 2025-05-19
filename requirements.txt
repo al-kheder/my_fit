@@ -19,3 +19,5 @@ requests~=2.32.3
 pytest~=8.3.5
 httpx~=0.28.1
 alembic~=1.10.4
+
+email-validator

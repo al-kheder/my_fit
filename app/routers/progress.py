@@ -4,6 +4,7 @@ from fastapi import APIRouter, HTTPException, Depends
 from typing import Annotated
 from fastapi.encoders import jsonable_encoder
 
+from app.models.progress import OverallSummary
 from app.models.users import User
 from app.authentications.security import get_current_user
 from app.db.database import database, workout_table, goal_table, progress_summary_table
@@ -22,7 +23,7 @@ def convert_datetime_fields(data: dict) -> dict:
             data[key] = convert_datetime_fields(value)
     return data
 
-@router.get("/workout-summary", description="Get combined workout and goal data for the current user")
+@router.get("/workout-summary",response_model=OverallSummary, description="Get combined workout and goal data for the current user")
 async def get_workout_progress_summary(current_user: Annotated[User, Depends(get_current_user)]):
     logger.info(f"Generating workout and goal summary for user: {current_user.id}")
 

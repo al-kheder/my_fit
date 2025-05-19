@@ -58,7 +58,6 @@ progress_summary_table =sqlalchemy.Table(
     sqlalchemy.Column("total_calories_burned", sqlalchemy.Integer),
     sqlalchemy.Column("remaining_duration_to_goal", sqlalchemy.Integer),
     sqlalchemy.Column("remaining_calories_to_goal", sqlalchemy.Integer),
-   # sqlalchemy.Column("created_at", sqlalchemy.DateTime, default=datetime.utcnow),
     sqlalchemy.Column("active_goals", sqlalchemy.JSON, nullable=True),
     sqlalchemy.Column("workouts", sqlalchemy.JSON, nullable=True)
 )
