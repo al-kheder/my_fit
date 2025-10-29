@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: my-fit-api
+    env: docker
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: ENV_STATE
+        value: prod
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ALGORITHM
+        value: HS256
+      - key: ACCESS_TOKEN_EXPIRE_MINUTES
+        value: 30
+      - key: RAPIDAPI_KEY
+        value: 3d90a1032fmsh5c69ad4f1431b77p141fbfjsndde5e48f1b1e
+      - key: RAPIDAPI_URL
+        value: https://chatgpt-42.p.rapidapi.com/chat
+
+databases:
+  - name: my-fit-db
+    databaseName: my_fit_db
+    user: my_fit_user
+    plan: free
