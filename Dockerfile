@@ -24,12 +24,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy project
 COPY . .
 
-# Create startup script that handles PORT variable
-RUN echo '#!/bin/bash\nset -e\nPORT=${PORT:-8000}\nexec uvicorn app.main:app --host 0.0.0.0 --port "$PORT"' > /app/start.sh && \
-    chmod +x /app/start.sh
-
 # Expose port
 EXPOSE 8000
 
-# Use the startup script
-CMD ["/app/start.sh"]
+# Use shell form to allow variable expansion
+CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"]
