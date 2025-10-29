@@ -27,5 +27,7 @@ COPY . .
 # Expose port
 EXPOSE 8000
 
-# Use shell form to allow variable expansion
-CMD uvicorn main:app --host 0.0.0.0 --port $PORT
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+ENTRYPOINT ["/entrypoint.sh"]
+
